@@ -1,10 +1,10 @@
-# Ollama Behind Caddy Proxy
+# Ollama Behind Caddy Proxy with API Key Validation
 
 Set up a Caddy server to securely authenticate and proxy requests to your local Ollama instance. It includes API key validation using a bash script, with keys stored in a config file.
 
 ## Features
 
-- **Secure API Access**: Uses Caddy to enforce API key authentication, allowing only requests with valid `Bearer` token/api-key.
+- **Secure API Access**: Uses Caddy and Socat to enforce API key authentication, allowing only requests with valid `Bearer` token/api-key.
 - **API Key Validation**: Validates API keys from a configuration file using a bash script.
 - **Flexible Interaction**: Supports all endpoints to interact with the Ollama API.
 - **Dockerized Setup**: Both Ollama and Caddy are containerized.
