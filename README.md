@@ -2,7 +2,7 @@
 
 Set up a Caddy server to securely authenticate and proxy requests to your local Ollama instance. It includes API key validation using a bash script, with keys stored in a config file.
 
-If you're interested in using `OLLAMA_API_KEY` as a local environment variable, check out my other repo: [ollama-bearer-auth-caddy](https://github.com/bartolli/ollama-bearer-auth-caddy).
+If you're interested in using `OLLAMA_API_KEY` as a local environment variable, check out my other repo: [ollama-bearer-auth](https://github.com/bartolli/ollama-bearer-auth).
 
 ## Features
 
