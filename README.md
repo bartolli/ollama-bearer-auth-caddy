@@ -48,8 +48,6 @@ On Linux and macOS, the manifests use colons (":") in filenames, which are not p
 Read more here: [Issue 2032](https://github.com/ollama/ollama/issues/2032)
 and here: [Issue 2832 Comment](https://github.com/ollama/ollama/issues/2832#issuecomment-1994889376)
 
-Mount a volume to store and keep all Ollama models outside the container
-
 ## Build your own
 
 Clone the repository:
@@ -79,7 +77,7 @@ sk-ollama-78834bcb4c76d97d35a0c1acd0d938c6
 
 Copy the generated key and update your `valid_keys.conf` file with the new API key. You can add as many keys as you need. One key per line.
 
-## Build and run the services using Docker Compose
+## Build the image and run the services using Docker
 
 This command will build multi-architecture image for both linux/amd64 and linux/arm64 architectures
 
