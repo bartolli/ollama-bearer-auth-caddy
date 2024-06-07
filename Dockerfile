@@ -13,10 +13,6 @@ RUN LATEST_CADDY_URL=$(wget -qO- "https://api.github.com/repos/caddyserver/caddy
     && chown root:root /usr/bin/caddy \
     && chmod 755 /usr/bin/caddy
 
-# Copy the Caddyfile and .env.local to the container
-# COPY Caddyfile /etc/caddy/Caddyfile
-# COPY .env.local /etc/caddy/.env.local
-
 # Copy the Caddyfile and validation scripts to the container
 COPY Caddy/Caddyfile /etc/caddy/Caddyfile
 COPY Caddy/valid_keys.conf /etc/caddy/valid_keys.conf
