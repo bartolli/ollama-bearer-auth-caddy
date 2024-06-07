@@ -1,6 +1,6 @@
 # Ollama Behind Caddy Proxy
 
-Caddy server to securely authenticate and proxy requests to a local Ollama instance, utilizing environment-based API key validation for enhanced security.
+Set up a Caddy server to securely authenticate and proxy requests to your local Ollama instance. It includes API key validation using a bash script, with keys stored in a config file.
 
 ## Features
 
