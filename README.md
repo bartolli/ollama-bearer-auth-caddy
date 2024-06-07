@@ -5,6 +5,7 @@ Caddy server to securely authenticate and proxy requests to a local Ollama insta
 ## Features
 
 - **Secure API Access**: Uses Caddy to enforce API key authentication, allowing only requests with valid `Bearer` token/api-key.
+- **API Key Validation**: Validates API keys from a configuration file using a bash script.
 - **Flexible Interaction**: Supports all endpoints to interact with the Ollama API.
 - **Dockerized Setup**: Both Ollama and Caddy are containerized.
 - **Latest Versions**: Utilizes the latest versions of Ollama and Caddy, ensuring the setup benefits from the most recent updates, security patches, and features. Docker image is configured to pull the latest versions automatically.
@@ -19,25 +20,26 @@ Caddy server to securely authenticate and proxy requests to a local Ollama insta
 
 ## Run the container directly with Docker
 
-To run the container directly using the pre-built image from Docker Hub without Docker Compose, use the following command:
+To run the container directly using the pre-built image from Docker Hub without Docker Compose and mounth `valid_keys.conf`, use the command below. **Do not forget to generate new valid API keys and update the key file**:
 
 ```bash
-docker run -p 8081:8081 -e OLLAMA_API_KEY=your_ollama_key bartolli497/ollama-bearer-auth:cuda
+docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bartolli497/ollama-bearer-auth:cuda-socat
 ```
 
-**Replace `your_ollama_key` with the actual API key you generated.**
+**Replace the keys in `Caddy/valid_keys.conf` with the actual API keys you generated.**
 
 - **`-p 8081:8081`**: Maps port 8081 on your local machine to port 8081 in the container. Change to your preferences.
-- **`-e OLLAMA_API_KEY=your_ollama_key`**: Sets the `OLLAMA_API_KEY` environment variable in the container to your specific API key.
-- **`bartolli497/ollama-bearer-auth:latest`**: Specifies the Docker image to use, pulling it from Docker Hub.
+- **`-v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf`**: Maps the `Caddy/valid_keys.conf` on your host to `/etc/caddy/valid_keys.conf` path in your container.
+- **`bartolli497/ollama-bearer-auth:cuda-socat`**: Specifies the Docker image to use, pulling it from Docker Hub.
 
 Mount existing Ollama models from your host machine (optional)
 
 ```bash
-docker run -p 8081:8081 -e OLLAMA_API_KEY=your_ollama_key -v ~/.ollama:/root/.ollama bartolli497/ollama-bearer-auth:cuda
+docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf -v ~/.ollama:/root/.ollama bartolli497/ollama-bearer-auth:cuda-socat
 ```
 
 - **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring necessary files are available.
+- **`-v ollama_docker_volume:/root/.ollama`**: Mounts a volume to store and keep all Ollama models outside the container, so you don't have to download them anytime you restart the container.
 
 Note for Windows Users
 
@@ -48,22 +50,18 @@ and here: [Issue 2832 Comment](https://github.com/ollama/ollama/issues/2832#issu
 
 Mount a volume to store and keep all Ollama models outside the container
 
-```bash
-docker run -p 8081:8081 -e OLLAMA_API_KEY=your_ollama_key -v ollama_docker_volume:/root/.ollama bartolli497/ollama-bearer-auth:cuda
-```
-
 ## Build your own
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/bartolli/ollama-bearer-auth.git
-cd ollama-bearer-auth
+git clone https://github.com/bartolli/ollama-bearer-auth-caddy.git
+cd ollama-bearer-auth-caddy
 ```
 
 ## Configuration
 
-To customize the server behavior and update the API key, you need to modify the `Caddyfile` and `.env.local` files according to your requirements.
+To customize the server behavior and update the API key, you can modify the ports in the `Caddyfile` (do not change anything else). You MUST change the keys in `valid_keys.conf` file. You can use the key-generator below.
 
 ## Generating a secure API Key
 
@@ -79,7 +77,7 @@ This should generate something like this:
 sk-ollama-78834bcb4c76d97d35a0c1acd0d938c6
 ```
 
-Copy the generated key and update your `.env.local` file with the new API key.
+Copy the generated key and update your `valid_keys.conf` file with the new API key. You can add as many keys as you need. One key per line.
 
 ## Build and run the services using Docker Compose
 
