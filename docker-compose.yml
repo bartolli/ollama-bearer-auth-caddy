@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: ollama-bearer-auth:latest
+    image: your-image-name:tag
     ports:
       - "8081:8081"
     env_file:  # This directive is used to specify a file to import environment variables from

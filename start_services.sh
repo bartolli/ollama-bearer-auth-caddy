@@ -1,51 +1,70 @@
 #!/bin/bash
 
-# Print the environment variable for debugging
-echo "OLLAMA_API_KEY: '$OLLAMA_API_KEY'"
+# Define log file
+LOG_FILE="/var/log/service_monitor.log"
 
-# Ensure required environment variables are set
-if [ -z "$OLLAMA_API_KEY" ]; then
-    echo "OLLAMA_API_KEY is not set. Exiting."
-    exit 1
-fi
+# Create log directory for Caddy
+mkdir -p /var/log/caddy
+chown caddy:caddy /var/log/caddy
 
-# Start ollama in the background
+echo "Starting all services..." >> "$LOG_FILE"
+
+chmod +x /etc/caddy/validate_keys.sh
+
+# Start socat in the background to validate API keys
+socat TCP-LISTEN:9090,fork,reuseaddr EXEC:'/etc/caddy/validate_keys.sh' & >> "$LOG_FILE"
+SOCAT_PID=$!
+echo "$(date): Started socat with PID $SOCAT_PID" >> "$LOG_FILE"
+echo "$(date): validate_keys.sh invoked" >>  "$LOG_FILE" 2>&1
+
+# Start Ollama in the background
 ollama serve &
 OLLAMA_PID=$!
-# Start caddy in the background
+echo "$(date): Started Ollama with PID $OLLAMA_PID" >> "$LOG_FILE"
+
+# Start Caddy in the background
 caddy run --config /etc/caddy/Caddyfile &
 CADDY_PID=$!
+echo "$(date): Started Caddy with PID $CADDY_PID" >> "$LOG_FILE"
 
 # Function to check process status
 check_process() {
     wait $1
     STATUS=$?
-    if [ $STATUS -ne 0 ]; then
-        echo "Process $2 ($1) has exited with status $STATUS"
+    if [ $STATUS -ne 0; then
+        echo "$(date): Process $2 ($1) has exited with status $STATUS" >> "$LOG_FILE"
         exit $STATUS
     fi
 }
 
 # Handle shutdown signals
-trap "kill $OLLAMA_PID $CADDY_PID; exit 0" SIGTERM SIGINT
+trap "echo 'Received shutdown signal, stopping all services...' >> $LOG_FILE; kill $OLLAMA_PID $CADDY_PID $SOCAT_PID; exit 0" SIGTERM SIGINT
 
 # Wait for both services to start and monitor them
 while true; do
     if ! ps -p $OLLAMA_PID > /dev/null; then
-        echo "Ollama service is not running, checking for exit status"
+        echo "$(date): Ollama service is not running, checking for exit status" >> "$LOG_FILE"
         check_process $OLLAMA_PID "Ollama"
         # Only restart if check_process hasn't exited the script
-        echo "Starting Ollama now"
+        echo "$(date): Starting Ollama now" >> "$LOG_FILE"
         ollama serve &
         OLLAMA_PID=$!
     fi
     if ! ps -p $CADDY_PID > /dev/null; then
-        echo "Caddy service is not running, checking for exit status"
+        echo "$(date): Caddy service is not running, checking for exit status" >> "$LOG_FILE"
         check_process $CADDY_PID "Caddy"
         # Only restart if check_process hasn't exited the script
-        echo "Starting Caddy now"
+        echo "$(date): Starting Caddy now" >> "$LOG_FILE"
         caddy run --config /etc/caddy/Caddyfile &
         CADDY_PID=$!
+    fi
+    if ! ps -p $SOCAT_PID > /dev/null; then
+        echo "$(date): Socat service is not running, checking for exit status" >> "$LOG_FILE"
+        check_process $SOCAT_PID "Socat"
+        # Only restart if check_process hasn't exited the script
+        echo "$(date): Restarting socat now" >> "$LOG_FILE"
+        socat TCP-LISTEN:9090,fork,reuseaddr EXEC:'/etc/caddy/validate_keys.sh' &
+        SOCAT_PID=$!
     fi
     sleep 1
 done

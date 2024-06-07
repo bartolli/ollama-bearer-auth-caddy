@@ -1,0 +1,42 @@
+:8081 {
+    # Enable logging
+    log {
+        output file /var/log/caddy/access.log {
+            roll_size 5mb
+            roll_keep 2
+            roll_keep_for 720h
+        }
+        format json
+    }
+
+    # Proxy all requests to socat for validation
+    reverse_proxy /* http://localhost:9090 {
+        header_up Host {http.reverse_proxy.upstream.hostport}
+        header_up Authorization {http.request.header.Authorization}
+    }
+
+    # Define a matcher for socat validation response
+    @apiAuth {
+        header Proxy-Status valid_api_key
+    }
+
+    # Proxy authorized requests
+    reverse_proxy @apiAuth http://localhost:11434 {
+        header_up Host {http.reverse_proxy.upstream.hostport}
+    }
+
+    # Define a matcher for unauthorized access
+    @unauthorized {
+        header Proxy-Status invalid_api_key
+    }
+
+    # Respond to unauthorized access
+    respond @unauthorized "Unauthorized" 401 {
+        close
+    }
+
+    # Handle errors
+    handle_errors {
+        respond "Bad Gateway" 502
+    }
+}
