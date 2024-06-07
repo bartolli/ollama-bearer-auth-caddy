@@ -38,7 +38,7 @@ Mount existing Ollama models from your host machine (optional)
 docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf -v ~/.ollama:/root/.ollama bartolli497/ollama-bearer-auth:cuda-socat
 ```
 
-- **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring necessary files are available.
+- **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring existing models are available.
 - **`-v ollama_docker_volume:/root/.ollama`**: Mounts a volume to store and keep all Ollama models outside the container, so you don't have to download them anytime you restart the container.
 
 Note for Windows Users
