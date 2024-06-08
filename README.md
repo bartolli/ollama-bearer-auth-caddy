@@ -36,7 +36,7 @@ docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bart
 Mount existing Ollama models from your host machine (optional)
 
 ```bash
-docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf -v ~/.ollama:/root/.ollama bartolli497/xcaddy-auth:ollama
+docker run -p 8081:8081 -v ~/.ollama:/root/.ollama bartolli497/xcaddy-auth:ollama
 ```
 
 - **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring existing models are available.
