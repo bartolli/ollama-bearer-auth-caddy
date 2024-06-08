@@ -1,18 +1,17 @@
 # Ollama Behind Caddy Proxy with API Key Validation
 
-Set up a Caddy server to securely authenticate and proxy requests to your local Ollama instance. It includes API key validation using a bash script, with keys stored in a config file.
+Set up a Caddy server to securely authenticate and proxy requests to your local Ollama instance. It includes API key validation with keys stored in a config file.
 
 If you're interested in using `OLLAMA_API_KEY` as a local environment variable, check out my other repo: [ollama-bearer-auth](https://github.com/bartolli/ollama-bearer-auth).
 
 ## Features
 
-- **Secure API Access**: Uses Caddy and Socat to enforce API key authentication, allowing only requests with valid `Bearer` token/api-key.
-- **API Key Validation**: Validates API keys from a configuration file using a bash script.
+- **Secure API Access**: Uses Caddy and Uvicorn to enforce API key authentication, allowing only requests with valid `Bearer` token/api-key.
+- **API Key Validation**: Validates API keys from a configuration file.
 - **Flexible Interaction**: Supports all endpoints to interact with the Ollama API.
 - **Dockerized Setup**: Both Ollama and Caddy are containerized.
-- **Latest Versions**: Utilizes the latest versions of Ollama and Caddy, ensuring the setup benefits from the most recent updates, security patches, and features. Docker image is configured to pull the latest versions automatically.
+- **Latest Versions**: Utilizes the latest versions of Ollama
 - **GPU Support**: Based on NVIDIA CUDA 12.5.0-runtime-ubuntu22.04, optimized for GPU-accelerated host machines.
-- **Multi-Platform Architecture**: Supports building for both linux/amd64 and linux/arm64.
 
 ## Requirements
 
@@ -25,19 +24,19 @@ If you're interested in using `OLLAMA_API_KEY` as a local environment variable, 
 To run the container directly using the pre-built image from Docker Hub without Docker Compose and mounth `valid_keys.conf`, use the command below. **Do not forget to generate new valid API keys and update the key file**:
 
 ```bash
-docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bartolli497/ollama-bearer-auth:cuda-socat
+docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bartolli497/bartolli497/xcaddy-auth:ollama
 ```
 
 **Replace the keys in `Caddy/valid_keys.conf` with the actual API keys you generated.**
 
 - **`-p 8081:8081`**: Maps port 8081 on your local machine to port 8081 in the container. Change to your preferences.
 - **`-v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf`**: Maps the `Caddy/valid_keys.conf` on your host to `/etc/caddy/valid_keys.conf` path in your container.
-- **`bartolli497/ollama-bearer-auth:cuda-socat`**: Specifies the Docker image to use, pulling it from Docker Hub.
+- **`bartolli497/xcaddy-auth:ollama`**: Specifies the Docker image to use, pulling it from Docker Hub.
 
 Mount existing Ollama models from your host machine (optional)
 
 ```bash
-docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf -v ~/.ollama:/root/.ollama bartolli497/ollama-bearer-auth:cuda-socat
+docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf -v ~/.ollama:/root/.ollama bartolli497/xcaddy-auth:ollama
 ```
 
 - **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring existing models are available.
@@ -84,7 +83,7 @@ Copy the generated key and update your `valid_keys.conf` file with the new API k
 This command will build multi-architecture image for both linux/amd64 and linux/arm64 architectures
 
 ```bash
-docker buildx build --platform linux/amd64,linux/arm64 -t <your_username>/<image_name>:<tag> .
+docker build -t <your_username>/<image_name>:<tag> .
 ```
 
 ## Testing API Key Authentication
