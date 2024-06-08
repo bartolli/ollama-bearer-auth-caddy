@@ -24,7 +24,7 @@ If you're interested in using `OLLAMA_API_KEY` as a local environment variable, 
 To run the container directly using the pre-built image from Docker Hub without Docker Compose and mounth `valid_keys.conf`, use the command below. **Do not forget to generate new valid API keys and update the key file**:
 
 ```bash
-docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bartolli497/bartolli497/xcaddy-auth:ollama
+docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bartolli497/xcaddy-auth:ollama
 ```
 
 **Replace the keys in `Caddy/valid_keys.conf` with the actual API keys you generated.**
