@@ -21,26 +21,18 @@ If you're interested in using `OLLAMA_API_KEY` as a local environment variable, 
 
 ## Run the container directly with Docker
 
-To run the container directly using the pre-built image from Docker Hub without Docker Compose and mounth `valid_keys.conf`, use the command below. **Do not forget to generate new valid API keys and update the key file**:
-
-```bash
-docker run -p 8081:8081 -v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf bartolli497/xcaddy-auth:ollama
-```
-
-**Replace the keys in `Caddy/valid_keys.conf` with the actual API keys you generated.**
+**Replace the keys in `Caddy/valid_keys.conf` with the actual API keys you generated and mounth them to the container.**
 
 - **`-p 8081:8081`**: Maps port 8081 on your local machine to port 8081 in the container. Change to your preferences.
-- **`-v Caddy/valid_keys.conf:/etc/caddy/valid_keys.conf`**: Maps the `Caddy/valid_keys.conf` on your host to `/etc/caddy/valid_keys.conf` path in your container.
-- **`bartolli497/xcaddy-auth:ollama`**: Specifies the Docker image to use, pulling it from Docker Hub.
-
+- **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring existing models are available.
+- **`-v ollama_docker_volume:/root/.ollama`**: Mounts a volume to store and keep all Ollama models outside the container, so you don't have to download them anytime you restart the container.
 Mount existing Ollama models from your host machine (optional)
 
 ```bash
 docker run -p 8081:8081 -v ~/.ollama:/root/.ollama bartolli497/xcaddy-auth:ollama
 ```
 
-- **`-v ~/.ollama:/root/.ollama`**: Maps the `~/.ollama` directory on your host to the `/root/.ollama` directory in the container, ensuring existing models are available.
-- **`-v ollama_docker_volume:/root/.ollama`**: Mounts a volume to store and keep all Ollama models outside the container, so you don't have to download them anytime you restart the container.
+
 
 Note for Windows Users
 
