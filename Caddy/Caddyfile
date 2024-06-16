@@ -1,4 +1,4 @@
-:8081 {
+{
     # Enable logging
     log {
         output file /var/log/caddy/access.log {
@@ -8,31 +8,26 @@
         }
         format json
     }
+}
 
-    # Proxy all requests to socat for validation
-    reverse_proxy /* http://localhost:9090 {
-        header_up Host {http.reverse_proxy.upstream.hostport}
-        header_up Authorization {http.request.header.Authorization}
+:8081 {
+    # Forward authentication to the Python script
+    forward_auth /* localhost:9090 {
+        uri /validate
+        copy_headers Authorization
+        copy_headers Proxy-Status
     }
 
-    # Define a matcher for socat validation response
     @apiAuth {
         header Proxy-Status valid_api_key
     }
 
     # Proxy authorized requests
-    reverse_proxy @apiAuth http://localhost:11434 {
-        header_up Host {http.reverse_proxy.upstream.hostport}
-    }
+    reverse_proxy @apiAuth http://localhost:11434
 
     # Define a matcher for unauthorized access
     @unauthorized {
         header Proxy-Status invalid_api_key
-    }
-
-    # Respond to unauthorized access
-    respond @unauthorized "Unauthorized" 401 {
-        close
     }
 
     # Handle errors

@@ -16,7 +16,7 @@ def load_api_keys(file_path):
 API_KEYS_FILE_PATH = "/etc/caddy/valid_keys.conf"
 VALID_API_KEYS = load_api_keys(API_KEYS_FILE_PATH)
 
-@app.api_route("/", methods=["GET", "POST"])  # Add more requests if you want to use with Ollama
+@app.api_route("/validate", methods=["GET", "POST"])  # Add more requests if you want to use with Ollama
 async def validate_api_key(request: Request):
     authorization: str = request.headers.get("Authorization", "")
     if not authorization.startswith("Bearer "):

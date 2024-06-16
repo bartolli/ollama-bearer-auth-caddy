@@ -8,7 +8,7 @@ services:
     image: your-image-name:tag
     ports:
       - "8081:8081"
-    env_file:  # This directive is used to specify a file to import environment variables from
+    env_file:  # Import environment variables
       - .env.local
     environment:
       - OLLAMA_HOST=0.0.0.0
