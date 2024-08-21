@@ -3,20 +3,8 @@
 # Define log file
 LOG_FILE="/var/log/service_monitor.log"
 
-# Read the API keys from the file
-# API_KEYS=$(cat /etc/caddy/valid_keys.conf)
-
-# Set the OLLAMA_API_KEY environment variable for the current session
-# export OLLAMA_API_KEY="$API_KEYS"
-
-# Append the export command to the .bashrc file to persist the variable
-# echo 'export OLLAMA_API_KEY="'$API_KEYS'"' >> ~/.bashrc
-
 # Source the .bashrc file to apply the changes to the current session
 source ~/.bashrc
-
-# Print the OLLAMA_API_KEY environment variable to confirm it's set
-# echo $OLLAMA_API_KEY
 
 # Create log directory for Caddy
 mkdir -p /var/log/caddy
