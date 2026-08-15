@@ -4,7 +4,7 @@ services:
   server:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.ollama
     image: your-image-name:tag
     ports:
       - "8081:8081"

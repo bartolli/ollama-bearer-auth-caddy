@@ -1,0 +1,39 @@
+FROM ollama/ollama:latest
+
+USER root
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH"
+
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends bash procps curl ca-certificates python3 python3-venv && \
+    rm -rf /var/lib/apt/lists/*
+
+ARG TARGETARCH
+RUN CADDY_ARCH="${TARGETARCH}" && \
+    case "$CADDY_ARCH" in \
+        amd64|x86_64) CADDY_ARCH=amd64 ;; \
+        arm64|aarch64) CADDY_ARCH=arm64 ;; \
+        *) echo "Unsupported architecture: $CADDY_ARCH" >&2; exit 1 ;; \
+    esac && \
+    curl -fsSL "https://caddyserver.com/api/download?os=linux&arch=${CADDY_ARCH}&version=v2.8.4" -o /usr/local/bin/caddy && \
+    chmod +x /usr/local/bin/caddy
+
+RUN if ! id caddy >/dev/null 2>&1; then groupadd -f caddy && useradd -r -g caddy -s /usr/sbin/nologin caddy; fi
+
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip && \
+    /opt/venv/bin/pip install --no-cache-dir uvicorn fastapi
+
+WORKDIR /
+
+COPY start_services.sh /start_services.sh
+COPY Caddy/Caddyfile /etc/caddy/Caddyfile
+COPY Caddy/valid_keys.conf /etc/caddy/valid_keys.conf
+COPY app /app
+
+RUN chmod +x /start_services.sh
+
+EXPOSE 8081
+ENTRYPOINT ["/start_services.sh"]
